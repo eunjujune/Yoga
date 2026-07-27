@@ -915,3 +915,141 @@ textarea#importArea {
   line-height: 1.5;
   margin-bottom: 10px;
 }
+
+/* Pose Card Add Button */
+.pose-card .add-pose-btn {
+  padding: 4px 8px;
+  font-size: 11.5px;
+  border-radius: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ---------- Mobile Responsive Design ---------- */
+#mobileTabBar {
+  display: none;
+  background: var(--sage-800);
+  padding: 6px 12px;
+  gap: 8px;
+  border-bottom: 1px solid var(--sage-700);
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--beige-200);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mobile-tab-btn.active {
+  background: var(--cream);
+  color: var(--sage-900);
+}
+
+@media (max-width: 768px) {
+  #mobileTabBar {
+    display: flex;
+  }
+
+  #topbar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  #topbar .brand {
+    font-size: 16px;
+  }
+
+  #topbar .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  #styleBar {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  #styleBlurb {
+    display: none;
+  }
+
+  #main {
+    display: block;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #library {
+    display: none;
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    padding: 12px 10px 60px;
+  }
+
+  #dashboard {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 12px 10px 60px;
+  }
+
+  #main.mobile-view-library #library {
+    display: block;
+  }
+
+  #main.mobile-view-builder #dashboard {
+    display: block;
+  }
+
+  #detailPanel {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    width: 100%;
+    height: 100%;
+    transform: translateY(100%);
+    opacity: 0;
+    border-right: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  #main.detail-open #detailPanel {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .pose-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+
+  .pose-row .row-info {
+    flex: 1 1 45%;
+  }
+
+  .flow-header {
+    padding: 12px 14px;
+  }
+
+  .flow-header .fh-name-input {
+    font-size: 18px;
+  }
+
+  .modal-box {
+    width: 95vw;
+    padding: 16px 14px;
+    max-height: 85vh;
+  }
+}

@@ -21,6 +21,11 @@
     <button class="btn ghost small" id="syncPosesBtn">🔄 Sync</button>
   </div>
 
+  <div id="mobileTabBar">
+    <button class="mobile-tab-btn" id="tabLibraryBtn">📚 Pose Library</button>
+    <button class="mobile-tab-btn active" id="tabBuilderBtn">📋 Flow Builder</button>
+  </div>
+
   <div id="styleBar">
     <label for="styleSelect">Style:</label>
     <select id="styleSelect"></select>
@@ -29,7 +34,7 @@
     <button class="btn" id="saveFlowBtn">Save Flow</button>
   </div>
 
-  <div id="main">
+  <div id="main" class="mobile-view-builder">
     <div id="library">
       <h2>Pose Library</h2>
       <input id="searchBox" type="text" placeholder="Search poses...">

@@ -255,6 +255,13 @@ function renderFlatGroup(container, label, list){
   container.appendChild(group);
 }
 
+function addPoseToCurrentFlow(poseNum){
+  if(!currentFlow) newFlow();
+  const targetSec = currentFlow.sections[0] || { items: [] };
+  targetSec.items.push(newItem(poseNum));
+  renderDashboard();
+}
+
 function makePoseCard(p){
   const card = document.createElement("div");
   card.className = "pose-card";
@@ -271,11 +278,19 @@ function makePoseCard(p){
       <div class="sk">${p.name && p.name!==p.en ? p.name : (p.feel||"")}</div>
     </div>
     <div class="fresh-dot ${fresh}" title="${title}"></div>
+    <button class="btn small add-pose-btn" title="Add to flow">+ Add</button>
   `;
   card.addEventListener("dragstart", e=>{
     e.dataTransfer.setData("text/plain", JSON.stringify({poseNum:p.num, source:"library"}));
   });
-  card.addEventListener("click", ()=> openDetail(p.num));
+  card.querySelector(".add-pose-btn").addEventListener("click", (e)=>{
+    e.stopPropagation();
+    addPoseToCurrentFlow(p.num);
+  });
+  card.addEventListener("click", (e)=>{
+    if(e.target.closest(".add-pose-btn")) return;
+    openDetail(p.num);
+  });
   return card;
 }
 
@@ -950,6 +965,28 @@ async function initApp() {
   renderLibrary();
   if (state.lastSync) refreshSyncStatus(state.lastSync);
   if (AUTO_SYNC_ON_LOAD) trySync(false);
+}
+
+/* MOBILE TAB SWITCHER */
+const tabLibraryBtn = document.getElementById("tabLibraryBtn");
+const tabBuilderBtn = document.getElementById("tabBuilderBtn");
+
+if (tabLibraryBtn && tabBuilderBtn) {
+  tabLibraryBtn.addEventListener("click", () => {
+    const main = document.getElementById("main");
+    main.classList.add("mobile-view-library");
+    main.classList.remove("mobile-view-builder");
+    tabLibraryBtn.classList.add("active");
+    tabBuilderBtn.classList.remove("active");
+  });
+
+  tabBuilderBtn.addEventListener("click", () => {
+    const main = document.getElementById("main");
+    main.classList.add("mobile-view-builder");
+    main.classList.remove("mobile-view-library");
+    tabBuilderBtn.classList.add("active");
+    tabLibraryBtn.classList.remove("active");
+  });
 }
 
 // Boot application when DOM is ready
