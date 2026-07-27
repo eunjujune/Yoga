@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoga Flow Builder</title>
+<style>
+  :root{
+    --sage-900:#2f4a3c;
+    --sage-800:#3b5c49;
+    --sage-700:#4a7059;
+    --sage-600:#5c8a6e;
+    --sage-500:#79a688;
+    --sage-300:#a9c7b3;
+    --sage-100:#dbe8de;
+    --beige-100:#f7f2e7;
+    --beige-200:#f0e8d8;
+    --beige-300:#e6dabf;
+    --beige-400:#d8c8a3;
+    --cream:#fbf8f1;
+    --ink:#33362f;
+    --ink-light:#6b6f64;
+    --amber:#c9922f;
+    --red:#b5533c;
+    --white:#ffffff;
+    --shadow:0 2px 8px rgba(47,74,60,0.12);
+    --shadow-lg:0 8px 28px rgba(47,74,60,0.22);
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background:var(--beige-100);
+    color:var(--ink);
+    overflow:hidden;
+  }
+  #app{
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    height:100vh;
+  }
+  /* ---------- Top bar ---------- */
+  #topbar{
+    background:var(--sage-900);
+    color:var(--cream);
+    padding:10px 18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    box-shadow:var(--shadow);
+    z-index:20;
+  }
+  #topbar .brand{
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-right:6px;
+  }
+  #topbar .brand .leaf{font-size:20px;}
+  .btn{
+    background:var(--sage-600);
+    color:var(--cream);
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    cursor:pointer;
+    font-weight:600;
+    transition:background .15s ease, transform .1s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{background:var(--sage-500);}
+  .btn:active{transform:scale(0.97);}
+  .btn.secondary{background:var(--beige-300);color:var(--sage-900);}
+  .btn.secondary:hover{background:var(--beige-400);}
+  .btn.ghost{background:transparent;border:1px solid var(--sage-500);color:var(--cream);}
+  .btn.ghost:hover{background:var(--sage-800);}
+  .btn.danger{background:var(--red);}
+  .btn.danger:hover{background:#9c4630;}
+  .btn.small{padding:5px 10px;font-size:12px;}
+  #topbar .spacer{flex:1;}
+  #teachBanner{
+    font-size:12.5px;
+    background:var(--sage-800);
+    padding:6px 12px;
+    border-radius:8px;
+    color:var(--beige-200);
+    display:none;
+    max-width:340px;
+  }
+  #teachBanner.show{display:block;}
+  #teachBanner b{color:var(--cream);}
+  #teachBanner.recent{background:#6b3f30;}
+  #syncStatus{font-size:11px;color:var(--sage-300);white-space:nowrap;}
+  #syncStatus.err{color:#e0a883;}
+
+  /* ---------- Style bar ---------- */
+  #styleBar{
+    background:var(--beige-200);
+    border-bottom:1px solid var(--beige-400);
+    padding:9px 18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  #styleBar label{font-size:13px;font-weight:700;color:var(--sage-800);}
+  #styleBar select{
+    padding:6px 10px;border-radius:8px;border:1px solid var(--beige-400);
+    background:var(--white);font-size:13px;color:var(--ink);font-weight:600;
+  }
+  #styleBlurb{
+    font-size:12.5px;color:var(--ink-light);font-style:italic;flex:1;min-width:200px;
+  }
+
+  /* ---------- Layout ---------- */
+  #main{
+    display:grid;
+    grid-template-columns:300px 0px 1fr;
+    height:100%;
+    overflow:hidden;
+    position:relative;
+  }
+  #main.detail-open{grid-template-columns:300px 340px 1fr;}
+
+  /* ---------- Library sidebar ---------- */
+  #library{
+    background:var(--cream);
+    border-right:1px solid var(--beige-400);
+    overflow-y:auto;
+    padding:14px 12px 40px;
+  }
+  #library h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--sage-700);
+    margin:4px 0 10px;
+  }
+  #searchBox{
+    width:100%;
+    padding:9px 12px;
+    border-radius:20px;
+    border:1px solid var(--beige-400);
+    background:var(--beige-100);
+    font-size:13.5px;
+    margin-bottom:8px;
+  }
+  #sortSelect{
+    width:100%;
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid var(--beige-400);
+    background:var(--beige-100);
+    font-size:12.5px;
+    margin-bottom:14px;
+    color:var(--ink-light);
+  }
+  .cat-group{margin-bottom:6px;}
+  .cat-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    padding:8px 10px;
+    background:var(--sage-100);
+    border-radius:8px;
+    font-weight:600;
+    font-size:13px;
+    color:var(--sage-900);
+    margin-bottom:6px;
+  }
+  .cat-header .count{
+    font-weight:400;
+    color:var(--sage-700);
+    font-size:11.5px;
+  }
+  .cat-header .chev{transition:transform .15s ease;font-size:11px;}
+  .cat-group.collapsed .chev{transform:rotate(-90deg);}
+  .cat-body{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  .cat-group.collapsed .cat-body{display:none;}
+
+  .pose-card{
+    background:var(--white);
+    border:1px solid var(--beige-300);
+    border-radius:10px;
+    padding:8px 10px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    cursor:grab;
+    transition:box-shadow .15s ease, border-color .15s ease;
+    position:relative;
+  }
+  .pose-card:hover{box-shadow:var(--shadow);border-color:var(--sage-500);}
+  .pose-card:active{cursor:grabbing;}
+  .pose-thumb{
+    width:36px;height:36px;border-radius:8px;
+    background:var(--sage-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;flex-shrink:0;overflow:hidden;
+  }
+  .pose-thumb img{width:100%;height:100%;object-fit:cover;}
+  .pose-info{min-width:0;flex:1;}
+  .pose-info .en{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pose-info .sk{font-size:11px;color:var(--ink-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fresh-dot{
+    width:9px;height:9px;border-radius:50%;flex-shrink:0;
+    background:var(--sage-500);
+    border:2px solid var(--white);
+    box-shadow:0 0 0 1px var(--beige-400);
+  }
+  .fresh-dot.amber{background:var(--amber);}
+  .fresh-dot.red{background:var(--red);}
+  .fresh-dot[title]:hover{cursor:help;}
+
+  /* ---------- Dashboard ---------- */
+  #dashboard{
+    overflow-y:auto;
+    padding:18px 22px 60px;
+    background:
+      radial-gradient(circle at 90% -10%, var(--beige-200) 0%, transparent 55%),
+      var(--beige-100);
+  }
+  #dashboard .empty-hint{
+    text-align:center;
+    color:var(--ink-light);
+    margin-top:60px;
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  /* Flow header card (name, description, duration/pose-count/style chips) */
+  .flow-header{
+    background:var(--white);
+    border:1px solid var(--beige-300);
+    border-radius:var(--radius);
+    padding:16px 20px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+  }
+  .flow-header .fh-name-input{
+    font-size:21px;font-weight:800;color:var(--sage-900);
+    border:none;outline:none;background:transparent;width:100%;padding:2px 0;
+  }
+  .flow-header .fh-desc{
+    width:100%;border:none;outline:none;background:transparent;resize:none;
+    font-size:13px;color:var(--ink-light);font-style:italic;padding:2px 0;font-family:inherit;
+  }
+  .flow-header .fh-meta-row{
+    display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;
+  }
+  .fh-chip{
+    background:var(--sage-100);color:var(--sage-800);padding:4px 11px;
+    border-radius:12px;font-weight:700;font-size:12px;
+  }
+  .fh-time{
+    display:flex;align-items:center;gap:5px;font-weight:700;font-size:13px;color:var(--sage-700);
+  }
+
+  /* Section divider — lightweight label, not a boxed card */
+  .section-divider{
+    display:flex;align-items:center;gap:8px;
+    margin:20px 2px 8px;
+  }
+  .section-divider .dot{width:7px;height:7px;border-radius:50%;background:var(--sage-600);flex-shrink:0;}
+  .section-title{
+    font-weight:700;font-size:13px;letter-spacing:0.2px;
+    text-transform:uppercase;color:var(--sage-700);
+    flex:1;background:transparent;border:none;outline:none;padding:2px 4px;border-radius:4px;
+  }
+  .section-title:focus{background:var(--beige-200);}
+  .section-count{font-size:11.5px;color:var(--ink-light);}
+  .section-divider .icon-btn{
+    background:none;border:none;color:var(--ink-light);cursor:pointer;font-size:13px;padding:2px 5px;
+  }
+  .section-divider .icon-btn:hover{color:var(--red);}
+
+  /* Simple numbered row list */
+  .row-list{
+    display:flex;flex-direction:column;
+    border-radius:10px;overflow:hidden;
+    background:var(--white);border:1px solid var(--beige-300);
+    box-shadow:var(--shadow);
+  }
+  .row-list.dragover{background:var(--sage-100);}
+  .row-list .placeholder{
+    padding:16px;color:var(--ink-light);font-size:12.5px;font-style:italic;
+  }
+  .pose-row{
+    display:flex;align-items:center;gap:11px;
+    padding:9px 12px;border-bottom:1px solid var(--beige-200);
+    background:var(--white);cursor:grab;position:relative;
+  }
+  .pose-row:last-child{border-bottom:none;}
+  .pose-row:hover{background:var(--beige-100);}
+  .pose-row .row-check{
+    width:17px;height:17px;border-radius:50%;border:2px solid var(--beige-400);
+    flex-shrink:0;cursor:pointer;background:var(--white);
+  }
+  .pose-row .row-check.checked{background:var(--sage-600);border-color:var(--sage-600);}
+  .pose-row .row-num{width:16px;text-align:center;font-size:11.5px;color:var(--ink-light);flex-shrink:0;}
+  .pose-row .row-thumb{
+    width:38px;height:38px;border-radius:8px;background:var(--sage-100);
+    display:flex;align-items:center;justify-content:center;font-size:17px;overflow:hidden;flex-shrink:0;
+  }
+  .pose-row .row-thumb img{width:100%;height:100%;object-fit:cover;}
+  .pose-row .row-info{flex:1;min-width:0;}
+  .pose-row .row-info .en{
+    font-size:13px;font-weight:700;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .pose-row .row-info .sub{font-size:11px;color:var(--ink-light);margin-top:1px;}
+  .pose-row .row-duration{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+  .pose-row .row-duration input{
+    width:50px;text-align:center;padding:5px 4px;border-radius:6px;
+    border:1px solid var(--beige-400);background:var(--beige-100);font-size:12.5px;
+  }
+  .pose-row .row-duration select{
+    padding:5px 6px;border-radius:6px;border:1px solid var(--beige-400);
+    background:var(--beige-100);font-size:11.5px;color:var(--ink-light);
+  }
+  .pose-row .row-remove{
+    background:none;border:none;color:var(--ink-light);cursor:pointer;
+    font-size:13px;padding:2px 4px;flex-shrink:0;
+  }
+  .pose-row .row-remove:hover{color:var(--red);}
+  #addSectionBtn{
+    display:block;margin:16px auto 0;
+  }
+
+  /* ---------- Detail panel ---------- */
+  #detailPanel{
+    background:var(--white);
+    border-right:1px solid var(--beige-400);
+    overflow-y:auto;
+    padding:0;
+    transform:translateX(-20px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  #main.detail-open #detailPanel{opacity:1;transform:translateX(0);pointer-events:auto;}
+  #detailPanel .dp-head{
+    background:var(--sage-800);
+    color:var(--cream);
+    padding:16px 18px;
+    position:relative;
+  }
+  #detailPanel .dp-close{
+    position:absolute;top:12px;right:12px;
+    background:rgba(255,255,255,0.15);border:none;color:var(--cream);
+    width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;
+  }
+  #detailPanel .dp-en{font-size:18px;font-weight:700;margin:0 0 2px;}
+  #detailPanel .dp-sk{font-size:13px;color:var(--sage-100);font-style:italic;}
+  #detailPanel .dp-cat{
+    display:inline-block;margin-top:8px;font-size:11px;background:var(--sage-600);
+    padding:3px 9px;border-radius:12px;
+  }
+  #detailPanel .dp-body{padding:16px 18px;}
+  #detailPanel .dp-photo{
+    width:100%;height:170px;border-radius:10px;background:var(--beige-200);
+    display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--sage-500);
+    overflow:hidden;margin-bottom:12px;position:relative;
+  }
+  #detailPanel .dp-photo img{width:100%;height:100%;object-fit:cover;}
+  #detailPanel .photo-actions{display:flex;gap:8px;margin-bottom:16px;}
+  #detailPanel .field{margin-bottom:14px;}
+  #detailPanel .field label{
+    display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;
+    color:var(--sage-700);font-weight:700;margin-bottom:4px;
+  }
+  #detailPanel .field textarea, #detailPanel .field input[type=text]{
+    width:100%;border:1px solid var(--beige-400);border-radius:8px;padding:8px;
+    font-size:13px;font-family:inherit;background:var(--beige-100);resize:vertical;
+  }
+  #detailPanel .field .value{font-size:13.5px;line-height:1.5;color:var(--ink);}
+  #detailPanel .video-chip{
+    display:inline-block;background:var(--sage-100);color:var(--sage-800);
+    padding:4px 9px;border-radius:8px;font-size:12px;margin:2px 3px 2px 0;
+  }
+  #detailPanel .freshness-note{
+    font-size:12px;padding:8px 10px;border-radius:8px;background:var(--sage-100);color:var(--sage-800);
+  }
+  #detailPanel .freshness-note.warn{background:#f6e3d6;color:#8a4a2c;}
+
+  /* ---------- Modal (Flows list / Import) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(47,74,60,0.45);
+    display:none;align-items:center;justify-content:center;z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--cream);border-radius:14px;box-shadow:var(--shadow-lg);
+    width:560px;max-width:92vw;max-height:82vh;overflow-y:auto;padding:22px 24px;
+  }
+  .modal-box h3{margin:0 0 14px;color:var(--sage-900);font-size:17px;}
+  .modal-box .close-row{display:flex;justify-content:flex-end;margin-top:16px;}
+  .flow-row{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--beige-300);
+    border-radius:10px;margin-bottom:8px;background:var(--white);
+  }
+  .flow-row .fr-main{flex:1;min-width:0;}
+  .flow-row .fr-name{font-weight:700;font-size:14px;color:var(--ink);}
+  .flow-row .fr-meta{font-size:11.5px;color:var(--ink-light);margin-top:2px;}
+  .flow-row .fr-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  textarea#importArea{width:100%;height:160px;font-family:monospace;font-size:12px;padding:10px;border-radius:8px;border:1px solid var(--beige-400);}
+  .hint-text{font-size:12px;color:var(--ink-light);line-height:1.5;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="brand"><span class="leaf">🌿</span> Yoga Flow Builder</div>
+    <button class="btn secondary" id="myFlowsBtn">My Flows</button>
+    <button class="btn secondary" id="newFlowBtn">New Flow</button>
+    <div id="teachBanner"></div>
+    <div class="spacer"></div>
+    <button class="btn ghost small" id="markTaughtBtn">✓ Mark taught today</button>
+    <button class="btn ghost small" id="exportBtn">Export backup</button>
+    <button class="btn ghost small" id="importBtn">Import backup</button>
+    <span id="syncStatus"></span>
+    <button class="btn ghost small" id="syncPosesBtn">🔄 Sync</button>
+  </div>
+
+  <div id="styleBar">
+    <label for="styleSelect">Style:</label>
+    <select id="styleSelect"></select>
+    <div id="styleBlurb"></div>
+    <button class="btn" id="saveFlowBtn">Save Flow</button>
+  </div>
+
+  <div id="main">
+    <div id="library">
+      <h2>Pose Library</h2>
+      <input id="searchBox" type="text" placeholder="Search poses...">
+      <select id="sortSelect">
+        <option value="category">Sort: by category</option>
+        <option value="lru">Sort: least recently used first</option>
+        <option value="az">Sort: A–Z</option>
+      </select>
+      <div id="libraryGroups"></div>
+    </div>
+
+    <div id="detailPanel"></div>
+
+    <div id="dashboard"></div>
+  </div>
+</div>
+
+<!-- My Flows modal -->
+<div class="modal-overlay" id="flowsModal">
+  <div class="modal-box">
+    <h3>My Flows</h3>
+    <div id="flowsList"></div>
+    <div class="close-row"><button class="btn secondary" data-close="flowsModal">Close</button></div>
+  </div>
+</div>
+
+<!-- Import backup modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal-box">
+    <h3>Import backup</h3>
+    <p class="hint-text">Paste the JSON you previously exported from "Export backup", or choose a file. This will merge/replace your flows, teach history and photos.</p>
+    <input type="file" id="importFile" accept="application/json" style="margin-bottom:10px;">
+    <textarea id="importArea" placeholder="...or paste exported JSON here"></textarea>
+    <div class="close-row">
+      <button class="btn secondary" data-close="importModal">Cancel</button>
+      <button class="btn" id="doImportBtn">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sync pose data modal (manual fallback, shown when live sync can't reach the sheet) -->
+<div class="modal-overlay" id="syncModal">
+  <div class="modal-box">
+    <h3 id="syncModalTitle">Manual sync</h3>
+    <p class="hint-text" id="syncModalHint">In Google Sheets: File → Download → Comma Separated Values (.csv) for the "Pose inventory" tab, then paste the contents below (or upload the file). Matching is done by the <b>#</b> column, so your saved flows stay linked correctly. New columns like <b>Picture</b> (image URL) will be picked up automatically.</p>
+    <input type="file" id="syncFile" accept=".csv,text/csv" style="margin-bottom:10px;">
+    <textarea id="syncArea" placeholder="#,Name,English,Asansa,Category,Key Instructions,Where you should feel,Picture,Videos&#10;1,Setu bandhasan,Bridge,Supine,..."></textarea>
+    <div class="close-row">
+      <button class="btn secondary" data-close="syncModal">Cancel</button>
+      <button class="btn" id="doSyncBtn">Update</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   POSE DATA — embedded from the "Yoga" spreadsheet (Pose inventory tab).
+   Pictures are blank for now (per user); update anytime via "Update pose
+   data". A localStorage override (yff_poses_override) takes precedence
+   over this default list once the user imports fresh CSV data.
+========================================================================= */
+const DEFAULT_POSES = [
+  {num:1,name:"Setu bandhasan",en:"Bridge",cat:"Supine",instr:"",feel:"",pic:"",vid:"Bridge.MOV"},
+  {num:2,name:"Supta badhakonasan",en:"Lying butterfly",cat:"Supine",instr:"",feel:"",pic:"",vid:"Butterfly + Wind Relieving Posture.MOV"},
+  {num:3,name:"Pawan Mukta asan (half and full)",en:"Wind relieving posture",cat:"Supine",instr:"",feel:"",pic:"",vid:"Butterfly + Wind Relieving Posture.MOV"},
+  {num:4,name:"Anand balasan and krida movement",en:"Happy baby",cat:"Supine",instr:"",feel:"",pic:"",vid:"Happy Baby + Rocking Happy Baby.MOV"},
+  {num:5,name:"Suchir randrasan",en:"Eye of the needle 1, 2, 3",cat:"Supine",instr:"",feel:"",pic:"",vid:"Eye of the Needle.MOV"},
+  {num:6,name:"Pada angusta asan",en:"Hand to toe pose 1, 2, 3",cat:"Supine",instr:"",feel:"",pic:"",vid:""},
+  {num:7,name:"",en:"Knee-hip rotation",cat:"Supine",instr:"",feel:"",pic:"",vid:"Hip Mobility Circles.MOV"},
+  {num:8,name:"Supta gomukasan",en:"Lying down cow face legs",cat:"Supine",instr:"",feel:"",pic:"",vid:""},
+  {num:9,name:"",en:"Simple lying down twist",cat:"Supine",instr:"",feel:"",pic:"",vid:""},
+  {num:10,name:"Garuda asan (legs)",en:"Eagle legs",cat:"Supine",instr:"",feel:"",pic:"",vid:""},
+  {num:11,name:"Vrikshasana",en:"Tree",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Tree Posture (opening)"},
+  {num:12,name:"Virabhadrasana II",en:"Warrior II",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Warrior 2"},
+  {num:13,name:"Pashwakonasan",en:"Side angle pose (half & full)",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Side angle posture"},
+  {num:14,name:"Trikonasana",en:"Triangle",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Triangle"},
+  {num:15,name:"Ardha Chandrasana",en:"Half moon",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Half moon posture"},
+  {num:16,name:"Ardha Chandra Kalasana",en:"Variation of half moon",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Half moon variation"},
+  {num:17,name:"Ardha Chandra Chapasan",en:"Bow variation",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:18,name:"Anjaneyasana",en:"Low lunge",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:19,name:"Prishthasana",en:"Lizard",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:20,name:"Malasana",en:"Asian squat",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:"Asian squat"},
+  {num:21,name:"Utkata Konasana",en:"Goddess posture",cat:"Standing - Open Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:22,name:"Half Hanumanasana",en:"Half split",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:"Half split"},
+  {num:23,name:"Virabhadrasana I",en:"Warrior I",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:24,name:"Virabhadrasana III",en:"Warrior III",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:25,name:"Parivritta Ardha Chandrasana",en:"Twisted half moon",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:26,name:"Parivritta Ardha Chandra Chapasana",en:"Bow variation twist",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:27,name:"Parivritta Trikonasana",en:"Twisted triangle",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:28,name:"Virasana (high lunge)",en:"High lunge",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:29,name:"Utkatasana",en:"Chair pose",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:30,name:"Garudasana",en:"Eagle",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:31,name:"Prasaritha padottanasana",en:"Wide legged forward bend",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:32,name:"Parivritta parsvakonasana",en:"Twisted side angle pose",cat:"Standing - Close Hip",instr:"",feel:"",pic:"",vid:""},
+  {num:33,name:"Makarasana",en:"Crocodile",cat:"Prone",instr:"",feel:"",pic:"",vid:""},
+  {num:34,name:"Matsya kridasana",en:"Mermaid",cat:"Prone",instr:"",feel:"",pic:"",vid:""},
+  {num:35,name:"Bhujangasana",en:"Cobra",cat:"Prone",instr:"",feel:"",pic:"",vid:""},
+  {num:36,name:"Salabhasana",en:"Locust",cat:"Prone",instr:"",feel:"",pic:"",vid:""},
+  {num:37,name:"Dhanurasana",en:"Bow",cat:"Prone",instr:"",feel:"",pic:"",vid:""},
+  {num:38,name:"Vajrasan",en:"Kneeling",cat:"Seated",instr:"",feel:"",pic:"",vid:""},
+  {num:39,name:"Sukhasana",en:"Easy pose",cat:"Seated",instr:"",feel:"",pic:"",vid:""},
+  {num:40,name:"Padmasana",en:"Lotus",cat:"Seated",instr:"",feel:"",pic:"",vid:"Half lotus and full lotus.MOV"},
+  {num:41,name:"Ardha padmasana",en:"Half lotus",cat:"Seated",instr:"",feel:"",pic:"",vid:"Half lotus and full lotus.MOV"},
+  {num:42,name:"Virasana (diamond seated)",en:"Diamond seated",cat:"Seated",instr:"",feel:"",pic:"",vid:""},
+  // Pranayama (breathing) — kept as its own group, useful for Centering & Breath section
+  {num:101,name:"Nadi Shodhana",en:"Alternate Nostril Breathing",cat:"Pranayama",instr:"",feel:"Heating",pic:"",vid:""},
+  {num:102,name:"Bhastrika",en:"Bellows Breath",cat:"Pranayama",instr:"",feel:"Heating",pic:"",vid:""},
+  {num:103,name:"Bhramari",en:"Humming Bee Breath",cat:"Pranayama",instr:"",feel:"Meditating",pic:"",vid:""},
+  // Sun Salutations — own group, useful for Warm-up section
+  {num:201,name:"Surya Namaskar A",en:"Sun Salutation A",cat:"Sun Salutation",instr:"",feel:"",pic:"",vid:"Sun salutation - full routine.MOV"},
+  {num:202,name:"Surya Namaskar B",en:"Sun Salutation B",cat:"Sun Salutation",instr:"",feel:"",pic:"",vid:""},
+];
+
+const CATEGORY_ORDER = ["Pranayama","Sun Salutation","Supine","Standing - Open Hip","Standing - Close Hip","Prone","Seated"];
+const CATEGORY_ICON = {
+  "Pranayama":"🌬️","Sun Salutation":"☀️","Supine":"🧘","Standing - Open Hip":"🧍",
+  "Standing - Close Hip":"🧍‍♀️","Prone":"🐊","Seated":"🪷"
+};
+
+const DEFAULT_SECTIONS = [
+  "Centering & Breath","Warm-Up","Standing Sequence","Balance & Core",
+  "Floor Work","Cool-Down","Savasana"
+];
+
+/* Yoga style presets — picking a style seeds a suggested section structure.
+   Each style's blurb explains the reasoning so it's clear why the structure differs. */
+const STYLE_META = {
+  vinyasa: {
+    label: "Vinyasa",
+    blurb: "Breath-linked, flowing. Sun salutations build heat, then a standing sequence leads to a peak pose before winding down.",
+    sections: ["Centering & Breath","Warm-Up (Sun Salutations)","Standing Sequence","Balance & Core","Peak Pose","Cool-Down (Floor & Supine)","Savasana"]
+  },
+  hatha: {
+    label: "Hatha",
+    blurb: "Slower-paced, static holds with clear alignment cues. Poses are worked through by body position rather than continuous flow.",
+    sections: ["Centering & Breath","Gentle Warm-Up","Standing Poses","Seated Poses","Backbends","Twists","Forward Folds","Savasana"]
+  },
+  yin: {
+    label: "Yin",
+    blurb: "Long, passive holds (2–5 min) targeting connective tissue. Mostly seated/supine — minimal standing work.",
+    sections: ["Centering & Breath","Gentle Warm-Up","Seated Holds (Hips & Spine)","Supine Holds","Restorative Cool-Down","Savasana"]
+  },
+  restorative: {
+    label: "Restorative",
+    blurb: "Very gentle, prop-supported poses held for long periods to activate deep rest. Few poses, minimal exertion.",
+    sections: ["Centering & Breath","Supported Reclining Poses","Supported Seated Poses","Extended Savasana"]
+  },
+  power: {
+    label: "Power / Ashtanga-style",
+    blurb: "Athletic and dynamic, with a faster pace and more repetition. Bigger emphasis on standing strength and balance work.",
+    sections: ["Centering & Breath","Dynamic Warm-Up (Sun Salutations)","Standing Power Sequence","Balance & Core","Peak Pose","Backbends","Cool-Down","Savasana"]
+  },
+  custom: {
+    label: "Custom / Other",
+    blurb: "No preset structure — start from a blank slate and build sections your own way.",
+    sections: ["Warm-Up","Main Sequence","Savasana"]
+  }
+};
+const DEFAULT_STYLE = "vinyasa";
+
+const RECENT_WINDOW_DAYS = 21;     // for library freshness dots
+const REPEAT_WARN_DAYS = 14;       // for "used recently" tags + banner tone
+const DEFAULT_DURATION = 30;       // seconds, applied when a pose is first added to a flow
+const DEFAULT_UNIT = "sec";        // "sec" | "min"
+
+// Live sync source — the "Pose inventory" tab of your Yoga spreadsheet, exported as CSV.
+// This only works if the sheet is shared as "Anyone with the link can view"; Google's
+// CSV export endpoint won't serve a private sheet to a plain (unauthenticated) fetch.
+const SHEET_ID = "1fsGMUi7c5vnq80mUSW5YENYNIHJeiwOWXqgiCyt7kug";
+const SHEET_GID = "1671063210";
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+const AUTO_SYNC_ON_LOAD = true;
+
+/* =========================================================================
+   STORAGE LAYER
+========================================================================= */
+const STORE = {
+  flowsKey:"yff_flows", historyKey:"yff_history", imagesKey:"yff_images",
+  notesKey:"yff_notes", posesOverrideKey:"yff_poses_override", lastSyncKey:"yff_last_sync",
+  load(key, fallback){
+    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  },
+  save(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch(e){ console.warn("localStorage save failed", e); return false; }
+  }
+};
+
+let flows = STORE.load(STORE.flowsKey, []);
+let history = STORE.load(STORE.historyKey, []);     // [{id,flowId,flowName,date,poseIds:[]}]
+let images = STORE.load(STORE.imagesKey, {});       // {poseNum: dataURL or url}
+let notes = STORE.load(STORE.notesKey, {});         // {poseNum: {instr,feel}}
+let poseOverride = STORE.load(STORE.posesOverrideKey, null); // array or null
+flows.forEach(f => migrateFlow(f));                 // upgrade any pre-duration saved flows
+
+function getPoses(){ return poseOverride && poseOverride.length ? poseOverride : DEFAULT_POSES; }
+function findPose(num){ return getPoses().find(p => String(p.num) === String(num)); }
+
+function uid(prefix){ return prefix + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* =========================================================================
+   CURRENT FLOW STATE
+========================================================================= */
+let currentFlow = null; // {id, name, description, style, sections:[{id,title,items:[{uid,poseNum,duration,unit}]}], createdAt}
+
+function newItem(poseNum){
+  return {uid: uid("item"), poseNum: String(poseNum), duration: DEFAULT_DURATION, unit: DEFAULT_UNIT};
+}
+
+// Old saved flows used section.poseIds (array of pose-number strings). Convert
+// them in place to section.items so duration/unit can be tracked per instance.
+function migrateFlow(flow){
+  flow.sections.forEach(sec=>{
+    if(!sec.items && sec.poseIds){
+      sec.items = sec.poseIds.map(num => newItem(num));
+      delete sec.poseIds;
+    }
+    if(!sec.items) sec.items = [];
+  });
+  if(typeof flow.description !== "string") flow.description = "";
+  if(!flow.style) flow.style = DEFAULT_STYLE;
+  return flow;
+}
+
+function newFlow(style){
+  style = style && STYLE_META[style] ? style : DEFAULT_STYLE;
+  currentFlow = {
+    id: uid("flow"),
+    name: "",
+    description: "",
+    style: style,
+    sections: STYLE_META[style].sections.map(title => ({id: uid("sec"), title, items: []})),
+    createdAt: new Date().toISOString(),
+    savedYet: false
+  };
+  const sel = document.getElementById("styleSelect");
+  if(sel) sel.value = style;
+  renderStyleBlurb();
+  renderDashboard();
+  renderTeachBanner();
+}
+
+function loadFlowIntoEditor(flow){
+  currentFlow = migrateFlow(JSON.parse(JSON.stringify(flow)));
+  currentFlow.savedYet = true;
+  const sel = document.getElementById("styleSelect");
+  if(sel) sel.value = currentFlow.style;
+  renderStyleBlurb();
+  renderDashboard();
+  renderTeachBanner();
+  closeModal("flowsModal");
+}
+
+/* =========================================================================
+   HISTORY / DIVERSITY HELPERS
+========================================================================= */
+function daysAgo(iso){
+  const d = new Date(iso), now = new Date();
+  return Math.floor((now - d) / 86400000);
+}
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+}
+function historyForFlow(flowId){
+  return history.filter(h => h.flowId === flowId).sort((a,b)=> new Date(b.date)-new Date(a.date));
+}
+// How many distinct taught-sessions (within RECENT_WINDOW_DAYS) included this pose, across ALL flows
+function recentUsageCount(poseNum, windowDays){
+  const cutoff = Date.now() - windowDays*86400000;
+  return history.filter(h => new Date(h.date).getTime() >= cutoff && h.poseIds.includes(String(poseNum))).length;
+}
+// Most recent date (any flow) this pose was taught, excluding current flow's own most recent (still includes it, that's fine)
+function lastTaughtDateForPose(poseNum){
+  const entries = history.filter(h => h.poseIds.includes(String(poseNum)))
+                          .sort((a,b)=> new Date(b.date)-new Date(a.date));
+  return entries.length ? entries[0] : null;
+}
+function freshnessClass(poseNum){
+  const c = recentUsageCount(poseNum, RECENT_WINDOW_DAYS);
+  if(c >= 3) return "red";
+  if(c >= 1) return "amber";
+  return "";
+}
+
+/* =========================================================================
+   RENDER: LIBRARY
+========================================================================= */
+function renderLibrary(){
+  const search = document.getElementById("searchBox").value.trim().toLowerCase();
+  const sortMode = document.getElementById("sortSelect").value;
+  const container = document.getElementById("libraryGroups");
+  container.innerHTML = "";
+
+  let poses = getPoses().filter(p=>{
+    if(!search) return true;
+    return (p.en||"").toLowerCase().includes(search) || (p.name||"").toLowerCase().includes(search) || (p.cat||"").toLowerCase().includes(search);
+  });
+
+  if(sortMode === "az"){
+    poses = [...poses].sort((a,b)=> (a.en||a.name).localeCompare(b.en||b.name));
+    renderFlatGroup(container, "All poses (A–Z)", poses);
+    return;
+  }
+  if(sortMode === "lru"){
+    poses = [...poses].sort((a,b)=>{
+      const la = lastTaughtDateForPose(a.num), lb = lastTaughtDateForPose(b.num);
+      const ta = la ? new Date(la.date).getTime() : 0;
+      const tb = lb ? new Date(lb.date).getTime() : 0;
+      return ta - tb; // never-taught (0) first, then oldest first
+    });
+    renderFlatGroup(container, "Least recently used first", poses);
+    return;
+  }
+
+  // default: by category
+  CATEGORY_ORDER.forEach(cat=>{
+    const list = poses.filter(p=>p.cat===cat);
+    if(!list.length) return;
+    renderCatGroup(container, cat, list);
+  });
+  // any category not in CATEGORY_ORDER (from a future sync)
+  const extraCats = [...new Set(poses.map(p=>p.cat).filter(c=>c && !CATEGORY_ORDER.includes(c)))];
+  extraCats.forEach(cat=> renderCatGroup(container, cat, poses.filter(p=>p.cat===cat)));
+}
+
+function renderCatGroup(container, cat, list){
+  const group = document.createElement("div");
+  group.className = "cat-group";
+  group.innerHTML = `
+    <div class="cat-header">
+      <span>${CATEGORY_ICON[cat]||"🧘"} ${cat} <span class="count">(${list.length})</span></span>
+      <span class="chev">▾</span>
+    </div>
+    <div class="cat-body"></div>`;
+  group.querySelector(".cat-header").addEventListener("click", ()=> group.classList.toggle("collapsed"));
+  const body = group.querySelector(".cat-body");
+  list.forEach(p => body.appendChild(makePoseCard(p)));
+  container.appendChild(group);
+}
+function renderFlatGroup(container, label, list){
+  const group = document.createElement("div");
+  group.className = "cat-group";
+  group.innerHTML = `<div class="cat-header"><span>${label} <span class="count">(${list.length})</span></span><span class="chev">▾</span></div><div class="cat-body"></div>`;
+  group.querySelector(".cat-header").addEventListener("click", ()=> group.classList.toggle("collapsed"));
+  const body = group.querySelector(".cat-body");
+  list.forEach(p => body.appendChild(makePoseCard(p)));
+  container.appendChild(group);
+}
+
+function makePoseCard(p){
+  const card = document.createElement("div");
+  card.className = "pose-card";
+  card.draggable = true;
+  card.dataset.poseNum = p.num;
+  const img = images[p.num] || p.pic;
+  const fresh = freshnessClass(p.num);
+  const last = lastTaughtDateForPose(p.num);
+  const title = last ? `Last taught ${fmtDate(last.date)} (${daysAgo(last.date)}d ago) in "${last.flowName}"` : "Not taught yet";
+  card.innerHTML = `
+    <div class="pose-thumb">${img?`<img src="${img}" alt="">`:"🧘"}</div>
+    <div class="pose-info">
+      <div class="en">${p.en||p.name||"(unnamed)"}</div>
+      <div class="sk">${p.name && p.name!==p.en ? p.name : (p.feel||"")}</div>
+    </div>
+    <div class="fresh-dot ${fresh}" title="${title}"></div>
+  `;
+  card.addEventListener("dragstart", e=>{
+    e.dataTransfer.setData("text/plain", JSON.stringify({poseNum:p.num, source:"library"}));
+  });
+  card.addEventListener("click", ()=> openDetail(p.num));
+  return card;
+}
+
+/* =========================================================================
+   DURATION HELPERS
+========================================================================= */
+function itemSeconds(item){ return item.unit === "min" ? (Number(item.duration)||0)*60 : (Number(item.duration)||0); }
+function computeTotalSeconds(flow){
+  return flow.sections.reduce((sum,s)=> sum + s.items.reduce((n,it)=> n + itemSeconds(it), 0), 0);
+}
+function formatDuration(totalSeconds){
+  const m = Math.floor(totalSeconds/60), s = Math.round(totalSeconds%60);
+  if(m<=0) return `${s}s`;
+  if(s===0) return `${m}m`;
+  return `${m}m ${s}s`;
+}
+
+/* =========================================================================
+   RENDER: DASHBOARD
+========================================================================= */
+function renderDashboard(){
+  const el = document.getElementById("dashboard");
+  el.innerHTML = "";
+  if(!currentFlow){ newFlow(); return; }
+
+  // ---- Flow header: name, description, total time / pose count / style ----
+  const header = document.createElement("div");
+  header.className = "flow-header";
+  const poseCount = currentFlow.sections.reduce((n,s)=>n+s.items.length,0);
+  header.innerHTML = `
+    <input id="flowNameInput" class="fh-name-input" placeholder="Untitled flow name...">
+    <textarea id="flowDescInput" class="fh-desc" rows="1" placeholder="Add a short description of this flow..."></textarea>
+    <div class="fh-meta-row">
+      <span class="fh-time">⏱ ${formatDuration(computeTotalSeconds(currentFlow))}</span>
+      <span class="fh-chip">${poseCount} pose${poseCount===1?"":"s"}</span>
+      <span class="fh-chip">${STYLE_META[currentFlow.style] ? STYLE_META[currentFlow.style].label : "Vinyasa"}</span>
+    </div>
+  `;
+  const nameEl = header.querySelector("#flowNameInput");
+  const descEl = header.querySelector("#flowDescInput");
+  nameEl.value = currentFlow.name || "";
+  descEl.value = currentFlow.description || "";
+  nameEl.addEventListener("input", e=>{ currentFlow.name = e.target.value; });
+  descEl.addEventListener("input", e=>{ currentFlow.description = e.target.value; });
+  el.appendChild(header);
+
+  // ---- Sections as lightweight dividers + a simple numbered row list ----
+  let runningNumber = 0;
+  currentFlow.sections.forEach(section=>{
+    const divider = document.createElement("div");
+    divider.className = "section-divider";
+    divider.innerHTML = `
+      <span class="dot"></span>
+      <input class="section-title" value="${escapeAttr(section.title)}">
+      <span class="section-count">${section.items.length} pose${section.items.length===1?"":"s"}</span>
+      <button class="icon-btn" title="Remove section">✕</button>
+    `;
+    divider.querySelector(".section-title").addEventListener("change", e=>{ section.title = e.target.value; });
+    divider.querySelector(".icon-btn").addEventListener("click", ()=>{
+      if(section.items.length && !confirm(`Remove section "${section.title}" and the ${section.items.length} pose(s) in it?`)) return;
+      currentFlow.sections = currentFlow.sections.filter(s=>s.id!==section.id);
+      renderDashboard();
+    });
+    el.appendChild(divider);
+
+    const list = document.createElement("div");
+    list.className = "row-list";
+    if(!section.items.length){
+      list.innerHTML = `<div class="placeholder">Drag poses here from the library ←</div>`;
+    } else {
+      section.items.forEach((item, idx)=>{
+        runningNumber++;
+        list.appendChild(makeFlowRow(item, section.id, idx, runningNumber));
+      });
+    }
+    setupDropzone(list, section.id);
+    el.appendChild(list);
+  });
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "btn secondary";
+  addBtn.id = "addSectionBtn";
+  addBtn.textContent = "+ Add section";
+  addBtn.addEventListener("click", ()=>{
+    currentFlow.sections.push({id:uid("sec"), title:"New section", items:[]});
+    renderDashboard();
+  });
+  el.appendChild(addBtn);
+}
+
+function makeFlowRow(item, sectionId, index, rowNumber){
+  const p = findPose(item.poseNum) || {en:"(missing pose)",name:""};
+  const row = document.createElement("div");
+  row.className = "pose-row";
+  row.draggable = true;
+  const img = images[item.poseNum] || p.pic;
+  const cnt = recentUsageCount(item.poseNum, REPEAT_WARN_DAYS);
+  const fresh = freshnessClass(item.poseNum);
+  let usedTitle = "";
+  if(cnt>0){
+    const last = lastTaughtDateForPose(item.poseNum);
+    usedTitle = `Used ${daysAgo(last.date)}d ago (${cnt} session(s) in the last ${REPEAT_WARN_DAYS} days)`;
+  }
+  row.innerHTML = `
+    <span class="row-check"></span>
+    <span class="row-num">${rowNumber}</span>
+    <div class="row-thumb">${img?`<img src="${img}" alt="">`:"🧘"}</div>
+    <div class="row-info">
+      <div class="en"></div>
+      <div class="sub"></div>
+    </div>
+    <div class="row-duration">
+      <input type="number" min="0" class="dur-input" value="${item.duration}">
+      <select class="unit-select">
+        <option value="sec">sec</option>
+        <option value="min">min</option>
+      </select>
+    </div>
+    <span class="fresh-dot ${fresh}" title="${escapeAttr(usedTitle)}"></span>
+    <button class="row-remove" title="Remove">✕</button>
+  `;
+  row.querySelector(".en").textContent = p.en || p.name || "(unnamed)";
+  row.querySelector(".sub").textContent = p.cat || "";
+  row.querySelector(".unit-select").value = item.unit;
+
+  row.querySelector(".row-check").addEventListener("click", (e)=>{
+    e.target.classList.toggle("checked");
+  });
+  row.querySelector(".dur-input").addEventListener("input", e=>{
+    item.duration = Number(e.target.value) || 0;
+    updateTotalTimeDisplay();
+  });
+  row.querySelector(".unit-select").addEventListener("change", e=>{
+    item.unit = e.target.value;
+    updateTotalTimeDisplay();
+  });
+  row.querySelector(".row-remove").addEventListener("click", ()=>{
+    const sec = currentFlow.sections.find(s=>s.id===sectionId);
+    sec.items.splice(index,1);
+    renderDashboard();
+  });
+  row.addEventListener("click", (e)=>{
+    if(e.target.closest(".row-remove,.row-check,.dur-input,.unit-select")) return;
+    openDetail(item.poseNum);
+  });
+  row.addEventListener("dragstart", e=>{
+    e.dataTransfer.setData("text/plain", JSON.stringify({itemUid:item.uid, poseNum:item.poseNum, source:"dashboard", fromSection:sectionId, fromIndex:index}));
+  });
+  return row;
+}
+
+function updateTotalTimeDisplay(){
+  const el = document.querySelector(".fh-time");
+  if(el) el.textContent = `⏱ ${formatDuration(computeTotalSeconds(currentFlow))}`;
+}
+
+function setupDropzone(zone, sectionId){
+  zone.addEventListener("dragover", e=>{ e.preventDefault(); zone.classList.add("dragover"); });
+  zone.addEventListener("dragleave", ()=> zone.classList.remove("dragover"));
+  zone.addEventListener("drop", e=>{
+    e.preventDefault();
+    zone.classList.remove("dragover");
+    let data;
+    try{ data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch(err){ return; }
+    const targetSec = currentFlow.sections.find(s=>s.id===sectionId);
+    if(data.source === "library"){
+      targetSec.items.push(newItem(data.poseNum));
+    } else if(data.source === "dashboard"){
+      const fromSec = currentFlow.sections.find(s=>s.id===data.fromSection);
+      const [moved] = fromSec.items.splice(data.fromIndex,1);
+      targetSec.items.push(moved || newItem(data.poseNum));
+    }
+    renderDashboard();
+  });
+}
+
+function escapeAttr(s){ return (s||"").replace(/"/g,"&quot;"); }
+
+/* =========================================================================
+   DETAIL PANEL
+========================================================================= */
+function openDetail(poseNum){
+  const p = findPose(poseNum);
+  if(!p) return;
+  const main = document.getElementById("main");
+  main.classList.add("detail-open");
+  const panel = document.getElementById("detailPanel");
+  const img = images[poseNum] || p.pic;
+  const note = notes[poseNum] || {};
+  const last = lastTaughtDateForPose(poseNum);
+  const cnt = recentUsageCount(poseNum, REPEAT_WARN_DAYS);
+
+  panel.innerHTML = `
+    <div class="dp-head">
+      <button class="dp-close">✕</button>
+      <div class="dp-en">${p.en||p.name}</div>
+      <div class="dp-sk">${p.name && p.name!==p.en ? p.name : ""}</div>
+      <span class="dp-cat">${p.cat}</span>
+    </div>
+    <div class="dp-body">
+      <div class="dp-photo" id="dpPhoto">${img?`<img src="${img}" alt="">`:"🧘"}</div>
+      <div class="photo-actions">
+        <button class="btn small secondary" id="uploadPhotoBtn">Upload photo</button>
+        <button class="btn small ghost" id="urlPhotoBtn" style="color:var(--sage-800);border-color:var(--sage-500)">Use URL</button>
+        <input type="file" id="photoFileInput" accept="image/*" style="display:none">
+      </div>
+      <div class="field">
+        <label>Recent teaching</label>
+        <div class="freshness-note ${cnt>=1?'warn':''}">
+          ${last ? `Last taught <b>${fmtDate(last.date)}</b> (${daysAgo(last.date)} days ago) in "${last.flowName}".${cnt>=1?` Used in ${cnt} session(s) in the last ${REPEAT_WARN_DAYS} days — consider swapping for variety.`:''}` : "Not yet taught — a fresh pick!"}
+        </div>
+      </div>
+      <div class="field">
+        <label>Key instructions</label>
+        <textarea id="instrArea" rows="3" placeholder="Add cues/instructions...">${note.instr ?? p.instr ?? ""}</textarea>
+      </div>
+      <div class="field">
+        <label>Where you should feel it</label>
+        <textarea id="feelArea" rows="2" placeholder="Add sensation notes...">${note.feel ?? p.feel ?? ""}</textarea>
+      </div>
+      ${p.vid ? `<div class="field"><label>Reference video</label><div><span class="video-chip">🎬 ${p.vid}</span></div></div>` : ""}
+    </div>
+  `;
+  panel.querySelector(".dp-close").addEventListener("click", closeDetail);
+  panel.querySelector("#uploadPhotoBtn").addEventListener("click", ()=> panel.querySelector("#photoFileInput").click());
+  panel.querySelector("#photoFileInput").addEventListener("change", e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      images[poseNum] = reader.result;
+      STORE.save(STORE.imagesKey, images);
+      openDetail(poseNum);
+      renderLibrary();
+      renderDashboard();
+    };
+    reader.readAsDataURL(file);
+  });
+  panel.querySelector("#urlPhotoBtn").addEventListener("click", ()=>{
+    const url = prompt("Paste image URL:");
+    if(url){
+      images[poseNum] = url;
+      STORE.save(STORE.imagesKey, images);
+      openDetail(poseNum);
+      renderLibrary();
+      renderDashboard();
+    }
+  });
+  panel.querySelector("#instrArea").addEventListener("change", e=>{
+    notes[poseNum] = notes[poseNum] || {};
+    notes[poseNum].instr = e.target.value;
+    STORE.save(STORE.notesKey, notes);
+  });
+  panel.querySelector("#feelArea").addEventListener("change", e=>{
+    notes[poseNum] = notes[poseNum] || {};
+    notes[poseNum].feel = e.target.value;
+    STORE.save(STORE.notesKey, notes);
+  });
+}
+function closeDetail(){
+  document.getElementById("main").classList.remove("detail-open");
+}
+
+/* =========================================================================
+   TEACH BANNER (for the flow currently open in the editor)
+========================================================================= */
+function renderTeachBanner(){
+  const banner = document.getElementById("teachBanner");
+  if(!currentFlow || !currentFlow.savedYet){
+    banner.classList.remove("show","recent");
+    return;
+  }
+  const hist = historyForFlow(currentFlow.id);
+  if(!hist.length){
+    banner.classList.remove("show","recent");
+    return;
+  }
+  const last = hist[0];
+  const d = daysAgo(last.date);
+  banner.innerHTML = `Last taught this flow: <b>${fmtDate(last.date)}</b> (${d}d ago) · taught ${hist.length}x total`;
+  banner.classList.add("show");
+  if(d <= REPEAT_WARN_DAYS) banner.classList.add("recent"); else banner.classList.remove("recent");
+}
+
+/* =========================================================================
+   TOP BAR ACTIONS
+========================================================================= */
+document.getElementById("newFlowBtn").addEventListener("click", ()=>{
+  if(currentFlow && !currentFlow.savedYet && currentFlow.sections.some(s=>s.items.length)){
+    if(!confirm("Discard the unsaved flow you're building?")) return;
+  }
+  newFlow(document.getElementById("styleSelect").value);
+});
+
+document.getElementById("saveFlowBtn").addEventListener("click", ()=>{
+  const name = document.getElementById("flowNameInput").value.trim();
+  if(!name){ alert("Give your flow a name first."); return; }
+  currentFlow.name = name;
+  currentFlow.description = document.getElementById("flowDescInput").value;
+  const idx = flows.findIndex(f=>f.id===currentFlow.id);
+  const toSave = JSON.parse(JSON.stringify(currentFlow));
+  delete toSave.savedYet;
+  if(idx>=0) flows[idx] = toSave; else flows.push(toSave);
+  STORE.save(STORE.flowsKey, flows);
+  currentFlow.savedYet = true;
+  renderTeachBanner();
+  alert(`Saved "${name}".`);
+});
+
+document.getElementById("markTaughtBtn").addEventListener("click", ()=>{
+  if(!currentFlow || !currentFlow.savedYet){ alert("Save this flow first, then mark it as taught."); return; }
+  const allPoseIds = currentFlow.sections.flatMap(s=>s.items.map(it=>it.poseNum));
+  if(!allPoseIds.length){ alert("This flow has no poses yet."); return; }
+  history.push({
+    id: uid("h"), flowId: currentFlow.id, flowName: currentFlow.name,
+    date: new Date().toISOString(), poseIds: allPoseIds
+  });
+  STORE.save(STORE.historyKey, history);
+  renderTeachBanner();
+  renderLibrary();
+  renderDashboard();
+  alert(`Marked "${currentFlow.name}" as taught today.`);
+});
+
+document.getElementById("myFlowsBtn").addEventListener("click", ()=>{
+  renderFlowsModal();
+  openModal("flowsModal");
+});
+
+function renderFlowsModal(){
+  const list = document.getElementById("flowsList");
+  if(!flows.length){
+    list.innerHTML = `<p class="hint-text">No saved flows yet — build one and hit "Save Flow".</p>`;
+    return;
+  }
+  list.innerHTML = "";
+  [...flows].sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)).forEach(f=>{
+    const hist = historyForFlow(f.id);
+    const poseCount = f.sections.reduce((n,s)=>n+(s.items?s.items.length:0),0);
+    const row = document.createElement("div");
+    row.className = "flow-row";
+    row.innerHTML = `
+      <div class="fr-main">
+        <div class="fr-name">${f.name} <span style="font-weight:400;color:var(--sage-700);">· ${STYLE_META[f.style] ? STYLE_META[f.style].label : "Vinyasa"}</span></div>
+        <div class="fr-meta">${poseCount} poses · ${f.sections.length} sections
+          ${hist.length ? ` · last taught ${fmtDate(hist[0].date)} (${daysAgo(hist[0].date)}d ago) · ${hist.length}x total` : " · never taught"}
+        </div>
+      </div>
+      <div class="fr-btns">
+        <button class="btn small" data-load="${f.id}">Load</button>
+        <button class="btn small secondary" data-dup="${f.id}">Duplicate</button>
+        <button class="btn small danger" data-del="${f.id}">Delete</button>
+      </div>
+    `;
+    row.querySelector("[data-load]").addEventListener("click", ()=> loadFlowIntoEditor(f));
+    row.querySelector("[data-dup]").addEventListener("click", ()=>{
+      const copy = JSON.parse(JSON.stringify(f));
+      copy.id = uid("flow"); copy.name = f.name + " (copy)"; copy.createdAt = new Date().toISOString();
+      flows.push(copy); STORE.save(STORE.flowsKey, flows); renderFlowsModal();
+    });
+    row.querySelector("[data-del]").addEventListener("click", ()=>{
+      if(!confirm(`Delete "${f.name}"? Its teach history stays on record for diversity tracking but won't be loadable.`)) return;
+      flows = flows.filter(x=>x.id!==f.id);
+      STORE.save(STORE.flowsKey, flows);
+      renderFlowsModal();
+    });
+    list.appendChild(row);
+  });
+}
+
+/* Export / Import backup */
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const payload = {flows, history, images, notes, poseOverride, exportedAt:new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `yoga-flow-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+document.getElementById("importBtn").addEventListener("click", ()=> openModal("importModal"));
+document.getElementById("importFile").addEventListener("change", e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=> document.getElementById("importArea").value = reader.result;
+  reader.readAsText(file);
+});
+document.getElementById("doImportBtn").addEventListener("click", ()=>{
+  let data;
+  try{ data = JSON.parse(document.getElementById("importArea").value); }
+  catch(e){ alert("That doesn't look like valid JSON."); return; }
+  if(!confirm("This will replace your current flows, history and photos with the imported backup. Continue?")) return;
+  flows = data.flows || [];
+  flows.forEach(f => migrateFlow(f));
+  history = data.history || [];
+  images = data.images || {};
+  notes = data.notes || {};
+  poseOverride = data.poseOverride || null;
+  STORE.save(STORE.flowsKey, flows);
+  STORE.save(STORE.historyKey, history);
+  STORE.save(STORE.imagesKey, images);
+  STORE.save(STORE.notesKey, notes);
+  STORE.save(STORE.posesOverrideKey, poseOverride);
+  closeModal("importModal");
+  newFlow();
+  renderLibrary();
+  alert("Backup imported.");
+});
+
+/* =========================================================================
+   POSE SYNC — live fetch from the published spreadsheet CSV, with a
+   paste/upload modal as fallback when the fetch can't be made (e.g. the
+   sheet isn't shared as "Anyone with the link can view", or the browser
+   blocks the cross-origin request).
+========================================================================= */
+
+// Turn parsed CSV rows into pose objects. Throws if there's no usable '#' column.
+function posesFromCSVRows(rows){
+  const header = rows[0].map(h=>h.trim().toLowerCase());
+  // Body-position grouping (Supine/Standing/Prone/Seated) lives in the "Asansa"
+  // column in this sheet; "Category" is a separate (currently unused) column.
+  // Prefer Asansa, but fall back to Category if the sheet gets restructured.
+  const catIdx = header.indexOf("asansa") >= 0 ? header.indexOf("asansa") : header.indexOf("category");
+  const idx = {
+    num: header.indexOf("#"), name: header.indexOf("name"), en: header.indexOf("english"),
+    cat: catIdx, instr: header.indexOf("key instructions"),
+    feel: header.indexOf("where you should feel"), pic: header.indexOf("picture"),
+    vid: header.indexOf("videos")
+  };
+  const parsed = rows.slice(1).filter(r=>r.some(c=>c && c.trim())).map(r=>({
+    num: idx.num>=0 ? (r[idx.num]||"").trim() : "",
+    name: idx.name>=0 ? (r[idx.name]||"").trim() : "",
+    en: idx.en>=0 ? (r[idx.en]||"").trim() : "",
+    cat: idx.cat>=0 ? (r[idx.cat]||"").trim() : "",
+    instr: idx.instr>=0 ? (r[idx.instr]||"").trim() : "",
+    feel: idx.feel>=0 ? (r[idx.feel]||"").trim() : "",
+    pic: idx.pic>=0 ? (r[idx.pic]||"").trim() : "",
+    vid: idx.vid>=0 ? (r[idx.vid]||"").trim() : ""
+  })).filter(p=>p.num);
+  if(!parsed.length){
+    throw new Error("Couldn't find any valid rows (need a '#' column) — this usually means the file isn't the right sheet, or (for a live fetch) Google returned a sign-in page instead of CSV.");
+  }
+  return parsed;
+}
+
+function applyParsedPoses(parsed){
+  // keep Pranayama / Sun Salutation groups from current data set since they live on other tabs
+  const keepExtra = getPoses().filter(p=>p.cat==="Pranayama"||p.cat==="Sun Salutation");
+  poseOverride = [...parsed, ...keepExtra];
+  STORE.save(STORE.posesOverrideKey, poseOverride);
+  renderLibrary();
+  renderDashboard();
+}
+
+function setSyncStatus(text, isErr){
+  const el = document.getElementById("syncStatus");
+  el.textContent = text;
+  el.classList.toggle("err", !!isErr);
+}
+function refreshSyncStatusFromStore(){
+  const last = STORE.load(STORE.lastSyncKey, null);
+  if(!last) return;
+  const when = daysAgo(last.date) === 0 ? "today" : `${daysAgo(last.date)}d ago`;
+  if(last.ok) setSyncStatus(`Synced ${last.count} poses · ${when}`, false);
+  else setSyncStatus(`Live sync unavailable · using saved data`, true);
+}
+
+// Attempt to fetch the sheet's CSV directly. `interactive` controls whether we
+// show alerts / open the manual fallback modal on failure (skip both for the
+// silent background attempt on page load).
+async function trySync(interactive){
+  const btn = document.getElementById("syncPosesBtn");
+  if(interactive){ btn.disabled = true; btn.textContent = "Syncing…"; }
+  try{
+    const controller = new AbortController();
+    const timeout = setTimeout(()=> controller.abort(), 8000);
+    const res = await fetch(SHEET_CSV_URL, {cache:"no-store", signal:controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error(`Sheet responded with status ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const parsed = posesFromCSVRows(rows);
+    applyParsedPoses(parsed);
+    STORE.save(STORE.lastSyncKey, {date:new Date().toISOString(), count:parsed.length, ok:true});
+    refreshSyncStatusFromStore();
+    if(interactive) alert(`Synced ${parsed.length} poses from your spreadsheet.`);
+    return true;
+  }catch(err){
+    STORE.save(STORE.lastSyncKey, {date:new Date().toISOString(), ok:false, reason:err.message});
+    refreshSyncStatusFromStore();
+    if(interactive){
+      document.getElementById("syncModalTitle").textContent = "Couldn't sync automatically";
+      document.getElementById("syncModalHint").innerHTML =
+        `Live sync failed (${escapeAttr(err.message)}). This is usually because the Google Sheet isn't shared as <b>"Anyone with the link can view."</b> Either update that sharing setting and hit Sync again, or paste/upload the CSV manually below (File → Download → CSV for the "Pose inventory" tab).`;
+      openModal("syncModal");
+    }
+    return false;
+  }finally{
+    if(interactive){ btn.disabled = false; btn.textContent = "🔄 Sync"; }
+  }
+}
+
+document.getElementById("syncPosesBtn").addEventListener("click", ()=> trySync(true));
+document.getElementById("syncFile").addEventListener("change", e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=> document.getElementById("syncArea").value = reader.result;
+  reader.readAsText(file);
+});
+document.getElementById("doSyncBtn").addEventListener("click", ()=>{
+  const raw = document.getElementById("syncArea").value.trim();
+  if(!raw){ alert("Paste or upload CSV first."); return; }
+  try{
+    const rows = parseCSV(raw);
+    const parsed = posesFromCSVRows(rows);
+    applyParsedPoses(parsed);
+    STORE.save(STORE.lastSyncKey, {date:new Date().toISOString(), count:parsed.length, ok:true});
+    refreshSyncStatusFromStore();
+    closeModal("syncModal");
+    alert(`Updated pose library: ${parsed.length} poses loaded.`);
+  }catch(err){
+    alert("Couldn't parse that CSV: " + err.message);
+  }
+});
+
+// minimal CSV parser handling quoted fields with commas
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i], n = text[i+1];
+    if(inQuotes){
+      if(c === '"' && n === '"'){ field+='"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field=""; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=""; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=>r.length>1 || (r.length===1 && r[0]!==""));
+}
+
+/* Modal helpers */
+function openModal(id){ document.getElementById(id).classList.add("show"); }
+function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+document.querySelectorAll("[data-close]").forEach(btn=>{
+  btn.addEventListener("click", ()=> closeModal(btn.dataset.close));
+});
+document.querySelectorAll(".modal-overlay").forEach(ov=>{
+  ov.addEventListener("click", e=>{ if(e.target===ov) closeModal(ov.id); });
+});
+
+document.getElementById("searchBox").addEventListener("input", renderLibrary);
+document.getElementById("sortSelect").addEventListener("change", renderLibrary);
+
+/* =========================================================================
+   STYLE PICKER
+========================================================================= */
+function populateStyleSelect(){
+  const sel = document.getElementById("styleSelect");
+  sel.innerHTML = Object.keys(STYLE_META).map(key =>
+    `<option value="${key}">${STYLE_META[key].label}</option>`).join("");
+}
+function renderStyleBlurb(){
+  const style = currentFlow ? currentFlow.style : DEFAULT_STYLE;
+  document.getElementById("styleBlurb").textContent = STYLE_META[style] ? STYLE_META[style].blurb : "";
+}
+document.getElementById("styleSelect").addEventListener("change", e=>{
+  const newStyle = e.target.value;
+  const hasPoses = currentFlow && currentFlow.sections.some(s=>s.items.length);
+  if(hasPoses){
+    const ok = confirm(`Switch to the ${STYLE_META[newStyle].label} structure? This replaces your current sections — poses already placed in them will be removed (the flow itself won't be saved until you hit "Save Flow").`);
+    if(!ok){ e.target.value = currentFlow.style; return; }
+  }
+  currentFlow.style = newStyle;
+  currentFlow.sections = STYLE_META[newStyle].sections.map(title => ({id: uid("sec"), title, items: []}));
+  renderStyleBlurb();
+  renderDashboard();
+});
+
+/* =========================================================================
+   INIT
+========================================================================= */
+populateStyleSelect();
+newFlow();
+renderLibrary();
+refreshSyncStatusFromStore();
+if(AUTO_SYNC_ON_LOAD) trySync(false);
+</script>
+</body>
+</html>
