@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yoga Flow Builder</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="brand"><span class="leaf">🌿</span> Yoga Flow Builder</div>
+    <button class="btn secondary" id="myFlowsBtn">My Flows</button>
+    <button class="btn secondary" id="newFlowBtn">New Flow</button>
+    <div id="teachBanner"></div>
+    <div class="spacer"></div>
+    <button class="btn ghost small" id="markTaughtBtn">✓ Mark taught today</button>
+    <button class="btn ghost small" id="exportBtn">Export backup</button>
+    <button class="btn ghost small" id="importBtn">Import backup</button>
+    <span id="syncStatus"></span>
+    <button class="btn ghost small" id="syncPosesBtn">🔄 Sync</button>
+  </div>
+
+  <div id="styleBar">
+    <label for="styleSelect">Style:</label>
+    <select id="styleSelect"></select>
+    <button class="btn ghost small" id="manageStylesBtn" style="color:var(--sage-900);border-color:var(--beige-400);">⚙️ Templates</button>
+    <div id="styleBlurb"></div>
+    <button class="btn" id="saveFlowBtn">Save Flow</button>
+  </div>
+
+  <div id="main">
+    <div id="library">
+      <h2>Pose Library</h2>
+      <input id="searchBox" type="text" placeholder="Search poses...">
+      <select id="sortSelect">
+        <option value="category">Sort: by category</option>
+        <option value="lru">Sort: least recently used first</option>
+        <option value="az">Sort: A–Z</option>
+      </select>
+      <div id="libraryGroups"></div>
+    </div>
+
+    <div id="detailPanel"></div>
+
+    <div id="dashboard"></div>
+  </div>
+</div>
+
+<!-- My Flows modal -->
+<div class="modal-overlay" id="flowsModal">
+  <div class="modal-box">
+    <h3>My Flows</h3>
+    <div id="flowsList"></div>
+    <div class="close-row"><button class="btn secondary" data-close="flowsModal">Close</button></div>
+  </div>
+</div>
+
+<!-- Manage Style Templates modal -->
+<div class="modal-overlay" id="stylesModal">
+  <div class="modal-box" style="width: 640px;">
+    <h3>Style Templates</h3>
+    <p class="hint-text">Edit existing style presets or create new custom templates with your own default sequence sections.</p>
+    <button class="btn small" id="addTemplateBtn" style="margin-bottom: 12px;">+ Create New Template</button>
+    <div id="templatesList"></div>
+    <div class="close-row">
+      <button class="btn secondary" data-close="stylesModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit / Create Template Modal -->
+<div class="modal-overlay" id="editStyleModal">
+  <div class="modal-box">
+    <h3 id="editStyleTitle">Edit Style Template</h3>
+    <div class="field" style="margin-bottom: 10px;">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--sage-700);margin-bottom:4px;">STYLE NAME</label>
+      <input type="text" id="styleLabelInput" placeholder="e.g. Gentle Morning Flow" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--beige-400);background:var(--white);">
+    </div>
+    <div class="field" style="margin-bottom: 10px;">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--sage-700);margin-bottom:4px;">DESCRIPTION / BLURB</label>
+      <textarea id="styleBlurbInput" rows="2" placeholder="Short description of this yoga style..." style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--beige-400);background:var(--white);"></textarea>
+    </div>
+    <div class="field" style="margin-bottom: 14px;">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--sage-700);margin-bottom:4px;">SECTIONS (Comma separated)</label>
+      <textarea id="styleSectionsInput" rows="3" placeholder="e.g. Centering & Breath, Warm-Up, Standing Sequence, Cool-Down, Savasana" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--beige-400);background:var(--white);"></textarea>
+      <span class="hint-text" style="display:block;margin-top:4px;">List default section titles separated by commas.</span>
+    </div>
+    <div class="close-row">
+      <button class="btn secondary" data-close="editStyleModal">Cancel</button>
+      <button class="btn" id="saveTemplateBtn">Save Template</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import backup modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal-box">
+    <h3>Import backup</h3>
+    <p class="hint-text">Paste the JSON you previously exported from "Export backup", or choose a file. This will merge/replace your flows, teach history and photos.</p>
+    <input type="file" id="importFile" accept="application/json" style="margin-bottom:10px;">
+    <textarea id="importArea" placeholder="...or paste exported JSON here"></textarea>
+    <div class="close-row">
+      <button class="btn secondary" data-close="importModal">Cancel</button>
+      <button class="btn" id="doImportBtn">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sync pose data modal -->
+<div class="modal-overlay" id="syncModal">
+  <div class="modal-box">
+    <h3 id="syncModalTitle">Manual sync</h3>
+    <p class="hint-text" id="syncModalHint">In Google Sheets: File → Download → Comma Separated Values (.csv) for the "Pose inventory" tab, then paste the contents below (or upload the file). Matching is done by the <b>#</b> column, so your saved flows stay linked correctly. New columns like <b>Picture</b> (image URL) will be picked up automatically.</p>
+    <input type="file" id="syncFile" accept=".csv,text/csv" style="margin-bottom:10px;">
+    <textarea id="syncArea" placeholder="#,Name,English,Asansa,Category,Key Instructions,Where you should feel,Picture,Videos&#10;1,Setu bandhasan,Bridge,Supine,..."></textarea>
+    <div class="close-row">
+      <button class="btn secondary" data-close="syncModal">Cancel</button>
+      <button class="btn" id="doSyncBtn">Update</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
