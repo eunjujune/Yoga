@@ -1,0 +1,212 @@
+{
+  "flows": [
+    {
+      "id": "flow_ms3pgsajt8lg0",
+      "name": "test",
+      "description": "{\"poseNum\":102,\"source\":\"library\"}",
+      "style": "vinyasa",
+      "sections": [
+        {
+          "id": "sec_ms3pgsajyr29u",
+          "title": "Centering & Breath",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsaj5a57k",
+          "title": "Warm-Up (Sun Salutations)",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsajfymev",
+          "title": "Standing Sequence",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsajgg1wj",
+          "title": "Balance & Core",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsajro0fv",
+          "title": "Peak Pose",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsaj4qsok",
+          "title": "Cool-Down (Floor & Supine)",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pgsajfv58v",
+          "title": "Savasana",
+          "items": []
+        }
+      ],
+      "createdAt": "2026-07-27T20:54:47.611Z"
+    },
+    {
+      "id": "flow_ms3pi7x0g4twn",
+      "name": "test 2",
+      "description": "lolollll\n",
+      "style": "vinyasa",
+      "sections": [
+        {
+          "id": "sec_ms3pi7x0dr596",
+          "title": "Centering & Breath",
+          "items": [
+            {
+              "uid": "item_ms3pia88kd30n",
+              "poseNum": "102",
+              "duration": 30,
+              "unit": "sec"
+            }
+          ]
+        },
+        {
+          "id": "sec_ms3pi7x06xxw7",
+          "title": "Warm-Up (Sun Salutations)",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pi7x0t8j1e",
+          "title": "Standing Sequence",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pi7x0u7alb",
+          "title": "Balance & Core",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pi7x0lf8j9",
+          "title": "Peak Pose",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pi7x0rd7uc",
+          "title": "Cool-Down (Floor & Supine)",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pi7x0hkdnq",
+          "title": "Savasana",
+          "items": []
+        },
+        {
+          "id": "sec_ms3pjc4yxk0kz",
+          "title": "tttt ttttttt",
+          "items": [
+            {
+              "uid": "item_ms3pjfy20h93x",
+              "poseNum": "1",
+              "duration": 30,
+              "unit": "sec"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-07-27T20:55:54.516Z"
+    }
+  ],
+  "history": [],
+  "images": {},
+  "notes": {},
+  "poseOverride": null,
+  "lastSync": {
+    "date": "2026-07-27T21:07:08.896Z",
+    "ok": false,
+    "reason": "Failed to fetch"
+  },
+  "styles": {
+    "vinyasa": {
+      "id": "vinyasa",
+      "label": "Vinyasa",
+      "blurb": "Breath-linked, flowing. Sun salutations build heat, then a standing sequence leads to a peak pose before winding down.",
+      "sections": [
+        "Centering & Breath",
+        "Warm-Up (Sun Salutations)",
+        "Standing Sequence",
+        "Balance & Core",
+        "Peak Pose",
+        "Cool-Down (Floor & Supine)",
+        "Savasana"
+      ]
+    },
+    "hatha": {
+      "id": "hatha",
+      "label": "Hatha",
+      "blurb": "Slower-paced, static holds with clear alignment cues. Poses are worked through by body position rather than continuous flow.",
+      "sections": [
+        "Centering & Breath",
+        "Gentle Warm-Up",
+        "Standing Poses",
+        "Seated Poses",
+        "Backbends",
+        "Twists",
+        "Forward Folds",
+        "Savasana"
+      ]
+    },
+    "yin": {
+      "id": "yin",
+      "label": "Yin",
+      "blurb": "Long, passive holds (2–5 min) targeting connective tissue. Mostly seated/supine — minimal standing work.",
+      "sections": [
+        "Centering & Breath",
+        "Gentle Warm-Up",
+        "Seated Holds (Hips & Spine)",
+        "Supine Holds",
+        "Restorative Cool-Down",
+        "Savasana"
+      ]
+    },
+    "restorative": {
+      "id": "restorative",
+      "label": "Restorative",
+      "blurb": "Very gentle, prop-supported poses held for long periods to activate deep rest. Few poses, minimal exertion.",
+      "sections": [
+        "Centering & Breath",
+        "Supported Reclining Poses",
+        "Supported Seated Poses",
+        "Extended Savasana"
+      ]
+    },
+    "power": {
+      "id": "power",
+      "label": "Power / Ashtanga-style",
+      "blurb": "Athletic and dynamic, with a faster pace and more repetition. Bigger emphasis on standing strength and balance work.",
+      "sections": [
+        "Centering & Breath",
+        "Dynamic Warm-Up (Sun Salutations)",
+        "Standing Power Sequence",
+        "Balance & Core",
+        "Peak Pose",
+        "Backbends",
+        "Cool-Down",
+        "Savasana"
+      ]
+    },
+    "custom": {
+      "id": "custom",
+      "label": "Custom / Other",
+      "blurb": "No preset structure — start from a blank slate and build sections your own way.",
+      "sections": [
+        "Warm-Up",
+        "Main Sequence",
+        "Savasana"
+      ]
+    },
+    "style_eunju_wkhk": {
+      "id": "style_eunju_wkhk",
+      "label": "eunju",
+      "blurb": "",
+      "sections": [
+        "Centering & Breath",
+        "Warm-Up",
+        "Main Sequence",
+        "Cool-Down",
+        "Savasana"
+      ]
+    }
+  }
+}
